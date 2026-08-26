@@ -4,8 +4,10 @@ import { ExternalLink } from 'lucide-react';
 import { apiData } from '@/lib/api';
 import type { Experience } from '@/lib/types';
 import { Reveal, SectionHeading, Spinner, EmptyState, ErrorState } from '@/components/ui';
+import { useLang } from '@/lib/lang';
 
 export default function ExperiencePage() {
+  const { lang } = useLang();
   const [items, setItems] = useState<Experience[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -19,7 +21,7 @@ export default function ExperiencePage() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(load, []);
+  useEffect(load, [lang]);
 
   return (
     <section className="container-content py-16">
@@ -36,7 +38,6 @@ export default function ExperiencePage() {
       {!loading && !error && items.length === 0 && <EmptyState message="Belum ada data pengalaman." />}
 
       <div className="relative">
-        {/* Timeline rail */}
         {items.length > 0 && (
           <span className="absolute left-[5px] top-2 bottom-2 w-px bg-ink-700" aria-hidden="true" />
         )}

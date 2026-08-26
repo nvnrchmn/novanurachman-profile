@@ -4,8 +4,10 @@ import { Mail, MapPin, Send, Github, Linkedin, Check } from 'lucide-react';
 import { api, apiData } from '@/lib/api';
 import type { Profile } from '@/lib/types';
 import { Reveal, SectionHeading } from '@/components/ui';
+import { useLang } from '@/lib/lang';
 
 export default function ContactPage() {
+  const { lang } = useLang();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
   const [sending, setSending] = useState(false);
@@ -16,7 +18,7 @@ export default function ContactPage() {
     apiData<Profile | null>('/profile')
       .then(setProfile)
       .catch(() => setProfile(null));
-  }, []);
+  }, [lang]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,7 +52,6 @@ export default function ContactPage() {
       </Reveal>
 
       <div className="grid gap-10 md:grid-cols-[1fr_1.3fr]">
-        {/* Direct channels */}
         <Reveal>
           <div className="space-y-3">
             {profile?.email && (
@@ -96,7 +97,6 @@ export default function ContactPage() {
           </div>
         </Reveal>
 
-        {/* Form */}
         <Reveal delay={80}>
           {sent ? (
             <div className="card border-accent/30 p-8 text-center">

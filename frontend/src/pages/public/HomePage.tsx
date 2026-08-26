@@ -5,8 +5,10 @@ import { ArrowRight, MapPin, ExternalLink, Github } from 'lucide-react';
 import { apiData } from '@/lib/api';
 import type { Profile, Project } from '@/lib/types';
 import { Reveal, SectionHeading, Spinner } from '@/components/ui';
+import { useLang } from '@/lib/lang';
 
 export default function HomePage() {
+  const { lang } = useLang();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
@@ -21,7 +23,7 @@ export default function HomePage() {
         setProjects((pr || []).filter((x) => x.featured).slice(0, 3));
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [lang]);
 
   if (loading) {
     return (

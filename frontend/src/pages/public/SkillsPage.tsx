@@ -3,8 +3,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { apiData } from '@/lib/api';
 import type { Skill } from '@/lib/types';
 import { Reveal, SectionHeading, Spinner, EmptyState, ErrorState } from '@/components/ui';
+import { useLang } from '@/lib/lang';
 
 export default function SkillsPage() {
+  const { lang } = useLang();
   const [skills, setSkills] = useState<Skill[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -18,7 +20,7 @@ export default function SkillsPage() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(load, []);
+  useEffect(load, [lang]);
 
   const grouped = useMemo(() => {
     const map = new Map<string, Skill[]>();

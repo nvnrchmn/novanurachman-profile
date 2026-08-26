@@ -71,7 +71,7 @@ func defaultMeta() pageMeta {
 	}
 }
 
-func metaForPath(path string) pageMeta {
+func metaForPath(path, lang string) pageMeta {
 	meta := defaultMeta()
 
 	// Project detail pages take their meta from the project itself.
@@ -79,14 +79,18 @@ func metaForPath(path string) pageMeta {
 		slug := strings.TrimPrefix(path, "/projects/")
 		slug = strings.Trim(slug, "/")
 		if slug != "" && !strings.Contains(slug, "/") {
-			var title string
+			var titleEn, titleId sql.NullString
 			var summary, cover sql.NullString
 			err := database.DB.QueryRow(`
-				SELECT title, summary, cover_image FROM projects
+				SELECT title_en, title_id, summary_en, cover_image FROM projects
 				WHERE slug = ? AND is_published = 1 AND deleted_at IS NULL LIMIT 1
-			`, slug).Scan(&title, &summary, &cover)
+			`, slug).Scan(&titleEn, &titleId, &summary, &cover)
 			if err == nil {
-				meta.Title = title + " — Nova Nurachman"
+				if lang == "id" && titleId.Valid && titleId.String != "" {
+					meta.Title = titleId.String + " — Nova Nurachman"
+				} else {
+					meta.Title = titleEn.String + " — Nova Nurachman"
+				}
 				if summary.Valid && summary.String != "" {
 					meta.Description = summary.String
 				}
@@ -101,7 +105,7 @@ func metaForPath(path string) pageMeta {
 	// Static routes come from the seo_meta table so they are editable in the CMS.
 	var title, desc, og sql.NullString
 	err := database.DB.QueryRow(
-		"SELECT title, description, og_image FROM seo_meta WHERE path = ? LIMIT 1", path,
+		"SELECT title, description, og_image FROM seo_meta WHERE path = ? AND lang = ? LIMIT 1", path, lang,
 	).Scan(&title, &desc, &og)
 	if err == nil {
 		if title.Valid && title.String != "" {
@@ -158,15 +162,17 @@ func SPAHandler(c *fiber.Ctx) error {
 		return serveStatic(c, reqPath, ext)
 	}
 
+	lang := lang(c)
+
 	if err := loadSpaHTML(); err != nil {
-		return c.Status(503).SendString("Frontend belum di-build")
+		return c.Status(503).SendString("Frontend belum di-built")
 	}
 
 	spaMu.RLock()
 	out := spaHTML
 	spaMu.RUnlock()
 
-	meta := metaForPath(reqPath)
+	meta := metaForPath(reqPath, lang)
 	site := os.Getenv("SITE_URL")
 	if site == "" {
 		site = "https://novanurachman.my.id"

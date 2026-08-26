@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { Menu, X, Terminal } from 'lucide-react';
 
+import { LanguageSwitcher } from './LanguageSwitcher';
+
 const NAV = [
   { to: '/', label: 'Home' },
   { to: '/projects', label: 'Projects' },
@@ -40,7 +42,10 @@ export function PublicNav() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-7 md:flex" aria-label="Navigasi utama">
+        <div className="flex items-center gap-4">
+          <LanguageSwitcher />
+
+          <nav className="hidden items-center gap-7 md:flex" aria-label="Navigasi utama">
           {NAV.map((item) => (
             <NavLink
               key={item.to}
@@ -55,7 +60,8 @@ export function PublicNav() {
               {item.label}
             </NavLink>
           ))}
-        </nav>
+          </nav>
+        </div>
 
         <button
           onClick={() => setOpen((v) => !v)}
@@ -84,6 +90,9 @@ export function PublicNav() {
                 {item.label}
               </NavLink>
             ))}
+            <div className="mt-2 px-3 py-2">
+              <LanguageSwitcher />
+            </div>
           </div>
         </nav>
       )}

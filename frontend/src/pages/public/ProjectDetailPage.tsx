@@ -5,8 +5,10 @@ import { ArrowLeft, ExternalLink, Github } from 'lucide-react';
 import { apiData } from '@/lib/api';
 import type { Project } from '@/lib/types';
 import { Reveal, Spinner, ErrorState } from '@/components/ui';
+import { useLang } from '@/lib/lang';
 
 export default function ProjectDetailPage() {
+  const { lang } = useLang();
   const { slug } = useParams<{ slug: string }>();
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
@@ -20,7 +22,7 @@ export default function ProjectDetailPage() {
       .then(setProject)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [slug]);
+  }, [slug, lang]);
 
   if (loading) {
     return (

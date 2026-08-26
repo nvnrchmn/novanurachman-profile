@@ -5,8 +5,10 @@ import { ArrowRight, ExternalLink, Github } from 'lucide-react';
 import { apiData } from '@/lib/api';
 import type { Project } from '@/lib/types';
 import { Reveal, SectionHeading, Spinner, EmptyState, ErrorState } from '@/components/ui';
+import { useLang } from '@/lib/lang';
 
 export default function ProjectsPage() {
+  const { lang } = useLang();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -20,7 +22,7 @@ export default function ProjectsPage() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(load, []);
+  useEffect(load, [lang]);
 
   return (
     <section className="container-content py-16">

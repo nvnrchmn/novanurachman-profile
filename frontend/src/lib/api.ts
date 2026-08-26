@@ -8,6 +8,18 @@ export function getToken(): string | null {
   }
 }
 
+function currentLang(): string {
+  try {
+    // URL parameter takes precedence over stored preference
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlLang = urlParams.get('lang');
+    if (urlLang === 'id' || urlLang === 'in') return 'id';
+    return localStorage.getItem('site_lang') || 'en';
+  } catch {
+    return 'en';
+  }
+}
+
 export function setToken(token: string): void {
   try {
     localStorage.setItem(TOKEN_KEY, token);
@@ -45,7 +57,7 @@ export async function api<T = unknown>(path: string, opts: ApiOptions = {}): Pro
     if (token) finalHeaders.Authorization = `Bearer ${token}`;
   }
 
-  const res = await fetch(`/api${path}`, { ...rest, headers: finalHeaders });
+  const res = await fetch(`/api${path}?lang=${currentLang()}`, { ...rest, headers: finalHeaders });
 
   let body: any = null;
   const text = await res.text();
