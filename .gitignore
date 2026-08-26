@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Build output — deployed via rsync, never committed
+frontend/dist/
+backend/bin/
+
+# Secrets
+backend/.env
+.env
+.env.local
+*.pem
+
+# Uploads (user content lives on the server)
+uploads/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+*.swp
+
+# Logs
+*.log

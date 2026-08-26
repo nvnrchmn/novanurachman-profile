@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-ink-950 text-mist-50 font-sans antialiased;
+    /* Subtle grid, the classic "developer" texture — kept very low contrast. */
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+
+  ::selection {
+    background: rgba(74, 222, 128, 0.25);
+  }
+
+  /* Never remove focus rings — keyboard users depend on them. */
+  :focus-visible {
+    outline: 2px solid #4ade80;
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .container-content {
+    @apply mx-auto w-full max-w-content px-5 sm:px-8;
+  }
+
+  .mono-label {
+    @apply font-mono text-xs uppercase tracking-[0.18em] text-accent;
+  }
+
+  .card {
+    @apply rounded-lg border border-ink-700 bg-ink-800/60 transition-colors duration-200;
+  }
+
+  .card-hover {
+    @apply hover:border-accent/40 hover:bg-ink-800;
+  }
+
+  .btn {
+    /* 44px min height keeps the touch target accessible. */
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-md px-5
+           text-sm font-medium transition-colors duration-200;
+  }
+
+  .btn-primary {
+    @apply btn bg-accent text-ink-950 hover:bg-accent-dim;
+  }
+
+  .btn-outline {
+    /* Slightly brighter border than ink-700 so the secondary action stays
+       visible against the near-black background. */
+    @apply btn border border-ink-600 text-mist-200 hover:border-accent/60 hover:text-mist-50;
+  }
+
+  .link-underline {
+    @apply relative text-mist-200 transition-colors hover:text-accent;
+  }
+
+  .input {
+    @apply w-full rounded-md border border-ink-700 bg-ink-900 px-4 py-3 text-sm
+           text-mist-50 placeholder:text-mist-600
+           focus:border-accent/60 focus:outline-none;
+  }
+
+  .tag {
+    @apply inline-flex items-center rounded border border-ink-700 bg-ink-900
+           px-2 py-1 font-mono text-[11px] text-mist-400;
+  }
+}
+
+/* Respect users who ask for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
