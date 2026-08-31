@@ -1,3 +1,5 @@
+import { getToken } from './auth';
+
 const TOKEN_KEY = 'nova_admin_token';
 
 export function getToken(): string | null {
@@ -5,18 +7,6 @@ export function getToken(): string | null {
     return localStorage.getItem(TOKEN_KEY);
   } catch {
     return null;
-  }
-}
-
-function currentLang(): string {
-  try {
-    // URL parameter takes precedence over stored preference
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlLang = urlParams.get('lang');
-    if (urlLang === 'id' || urlLang === 'in') return 'id';
-    return localStorage.getItem('site_lang') || 'en';
-  } catch {
-    return 'en';
   }
 }
 
@@ -36,16 +26,33 @@ export function clearToken(): void {
   }
 }
 
-interface ApiOptions extends RequestInit {
-  auth?: boolean;
+function currentLang(): string {
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlLang = urlParams.get('lang');
+    if (urlLang === 'id' || urlLang === 'in') return 'id';
+    if (urlLang === 'en') return 'en';
+    return localStorage.getItem('site_lang') || 'en';
+  } catch {
+    return 'en';
+  }
 }
 
-/**
- * Thin fetch wrapper. Throws on non-2xx so callers can surface the server's
- * own message instead of a generic failure.
- */
+function csrfToken(): string {
+  try {
+    return document.cookie.replace(/(?:(?:^|.*;\s*)csrf_token\s*\=\s*([^;]*).*$)|^.*$/, '$1');
+  } catch {
+    return '';
+  }
+}
+
+interface ApiOptions extends RequestInit {
+  auth?: boolean;
+  skipCSRF?: boolean;
+}
+
 export async function api<T = unknown>(path: string, opts: ApiOptions = {}): Promise<T> {
-  const { auth, headers, ...rest } = opts;
+  const { auth, skipCSRF, headers, ...rest } = opts;
 
   const finalHeaders: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -55,6 +62,11 @@ export async function api<T = unknown>(path: string, opts: ApiOptions = {}): Pro
   if (auth) {
     const token = getToken();
     if (token) finalHeaders.Authorization = `Bearer ${token}`;
+  }
+
+  if (!skipCSRF) {
+    const token = csrfToken();
+    if (token) finalHeaders['X-CSRF-Token'] = token;
   }
 
   const res = await fetch(`/api${path}?lang=${currentLang()}`, { ...rest, headers: finalHeaders });
@@ -79,7 +91,6 @@ export async function api<T = unknown>(path: string, opts: ApiOptions = {}): Pro
   return body as T;
 }
 
-/** Unwraps the `{ success, data }` envelope the backend returns. */
 export async function apiData<T>(path: string, opts: ApiOptions = {}): Promise<T> {
   const res = await api<{ success: boolean; data: T }>(path, opts);
   return res.data;

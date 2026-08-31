@@ -8,7 +8,7 @@ import { Reveal, SectionHeading, Spinner } from '@/components/ui';
 import { useLang } from '@/lib/lang';
 
 export default function HomePage() {
-  const { lang } = useLang();
+  const { t, lang } = useLang();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,7 +39,9 @@ export default function HomePage() {
       <section className="container-content pb-16 pt-16 sm:pt-24">
         <Reveal>
           <p className="mono-label mb-5">
-            {profile?.available ? '● tersedia untuk proyek' : '○ sedang tidak tersedia'}
+            {profile?.available
+              ? t('● available for projects', '● tersedia untuk proyek')
+              : t('○ not available', '○ sedang tidak tersedia')}
           </p>
 
           <h1 className="text-3xl font-semibold leading-[1.15] tracking-tight text-mist-50 sm:text-5xl">
@@ -56,11 +58,11 @@ export default function HomePage() {
 
           <div className="mt-9 flex flex-wrap items-center gap-3">
             <Link to="/projects" className="btn-primary">
-              Lihat Proyek
+              {t('View Projects', 'Lihat Proyek')}
               <ArrowRight size={16} aria-hidden="true" />
             </Link>
             <Link to="/contact" className="btn-outline">
-              Hubungi Saya
+              {t('Contact Me', 'Hubungi Saya')}
             </Link>
           </div>
 
@@ -77,7 +79,7 @@ export default function HomePage() {
       {profile?.bio && (
         <section className="container-content py-14">
           <Reveal>
-            <SectionHeading label="about" title="Tentang" />
+            <SectionHeading label={t('about', 'tentang')} title={t('About', 'Tentang')} />
             <p className="max-w-[38rem] whitespace-pre-line text-[15px] leading-[1.75] text-mist-200">
               {profile.bio}
             </p>
@@ -89,7 +91,7 @@ export default function HomePage() {
       {projects.length > 0 && (
         <section className="container-content py-14">
           <Reveal>
-            <SectionHeading label="selected work" title="Proyek Pilihan" />
+            <SectionHeading label={t('selected work', 'proyek pilihan')} title={t('Selected Work', 'Proyek Pilihan')} />
           </Reveal>
 
           <div className="space-y-4">
@@ -113,11 +115,11 @@ export default function HomePage() {
                     <div className="mt-4 flex flex-wrap gap-1.5">
                       {p.tech_stack
                         .split(',')
-                        .map((t) => t.trim())
+                        .map((tr) => tr.trim())
                         .filter(Boolean)
-                        .map((t) => (
-                          <span key={t} className="tag">
-                            {t}
+                        .map((tech) => (
+                          <span key={tech} className="tag">
+                            {tech}
                           </span>
                         ))}
                     </div>
@@ -128,7 +130,7 @@ export default function HomePage() {
                       to={`/projects/${p.slug}`}
                       className="inline-flex items-center gap-1.5 font-mono text-xs text-accent"
                     >
-                      detail
+                      {t('detail', 'detail')}
                       <ArrowRight size={12} aria-hidden="true" />
                     </Link>
                     {p.live_url && (
@@ -164,7 +166,7 @@ export default function HomePage() {
               to="/projects"
               className="mt-8 inline-flex items-center gap-2 font-mono text-sm text-mist-400 hover:text-accent"
             >
-              semua proyek
+              {t('all projects', 'semua proyek')}
               <ArrowRight size={14} aria-hidden="true" />
             </Link>
           </Reveal>

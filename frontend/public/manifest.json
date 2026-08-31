@@ -1,0 +1,16 @@
+{
+  "name": "Nova Nurachman — Portfolio",
+  "short_name": "Nova",
+  "description": "Personal portfolio of Nova Nurachman",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#08090B",
+  "theme_color": "#4ADE80",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

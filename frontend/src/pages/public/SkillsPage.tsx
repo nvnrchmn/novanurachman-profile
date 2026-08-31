@@ -6,7 +6,7 @@ import { Reveal, SectionHeading, Spinner, EmptyState, ErrorState } from '@/compo
 import { useLang } from '@/lib/lang';
 
 export default function SkillsPage() {
-  const { lang } = useLang();
+  const { t, lang } = useLang();
   const [skills, setSkills] = useState<Skill[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -36,15 +36,18 @@ export default function SkillsPage() {
     <section className="container-content py-16">
       <Reveal>
         <SectionHeading
-          label="skills"
-          title="Keahlian"
-          description="Teknologi dan tools yang saya pakai sehari-hari."
+          label={t('skills', 'keahlian')}
+          title={t('Skills', 'Keahlian')}
+          description={t(
+            'Technologies and tools I use daily.',
+            'Teknologi dan tools yang saya gunakan sehari-hari.'
+          )}
         />
       </Reveal>
 
       {loading && <Spinner />}
       {!loading && error && <ErrorState message={error} onRetry={load} />}
-      {!loading && !error && skills.length === 0 && <EmptyState message="Belum ada data keahlian." />}
+      {!loading && !error && skills.length === 0 && <EmptyState message={t('No skills data.', 'Belum ada data keahlian.')} />}
 
       <div className="space-y-8">
         {grouped.map(([category, list], i) => (

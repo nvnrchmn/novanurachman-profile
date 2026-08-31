@@ -8,7 +8,7 @@ import { Reveal, Spinner, ErrorState } from '@/components/ui';
 import { useLang } from '@/lib/lang';
 
 export default function ProjectDetailPage() {
-  const { lang } = useLang();
+  const { t, lang } = useLang();
   const { slug } = useParams<{ slug: string }>();
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
@@ -41,14 +41,14 @@ export default function ProjectDetailPage() {
           className="mt-6 inline-flex items-center gap-2 font-mono text-sm text-mist-400 hover:text-accent"
         >
           <ArrowLeft size={14} aria-hidden="true" />
-          kembali ke proyek
+          {t('projects', 'proyek')}
         </Link>
       </div>
     );
   }
 
   const tech = project.tech_stack
-    ? project.tech_stack.split(',').map((t) => t.trim()).filter(Boolean)
+    ? project.tech_stack.split(',').map((tr) => tr.trim()).filter(Boolean)
     : [];
 
   return (
@@ -59,7 +59,7 @@ export default function ProjectDetailPage() {
           className="mb-8 inline-flex items-center gap-2 font-mono text-xs text-mist-600 hover:text-accent"
         >
           <ArrowLeft size={13} aria-hidden="true" />
-          projects
+          {t('projects', 'proyek')}
         </Link>
 
         <div className="flex flex-wrap items-baseline justify-between gap-3">
@@ -75,9 +75,9 @@ export default function ProjectDetailPage() {
 
         {tech.length > 0 && (
           <div className="mt-6 flex flex-wrap gap-1.5">
-            {tech.map((t) => (
-              <span key={t} className="tag">
-                {t}
+            {tech.map((techItem) => (
+              <span key={techItem} className="tag">
+                {techItem}
               </span>
             ))}
           </div>
@@ -87,14 +87,14 @@ export default function ProjectDetailPage() {
           <div className="mt-8 flex flex-wrap gap-3">
             {project.live_url && (
               <a href={project.live_url} target="_blank" rel="noreferrer noopener" className="btn-primary">
-                Lihat Live
+                {t('View Live', 'Lihat Live')}
                 <ExternalLink size={15} aria-hidden="true" />
               </a>
             )}
             {project.repo_url && (
               <a href={project.repo_url} target="_blank" rel="noreferrer noopener" className="btn-outline">
                 <Github size={15} aria-hidden="true" />
-                Repository
+                {t('Repository', 'Repositori')}
               </a>
             )}
           </div>

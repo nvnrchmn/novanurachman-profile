@@ -1,0 +1,30 @@
+# .hermesrules — novanurachman.my.id
+
+## Tech Stack
+- Backend: Go + Fiber v2, port 8084 (systemd: `nova-server`), binary `backend/bin/nova-server`
+- Frontend: React 18 + Vite + TypeScript + Tailwind → static build `frontend/dist/`, disajikan nginx
+- Database: MySQL `nova_profile` (akses root via `sudo -n mysql nova_profile`)
+- Auth: JWT + bcrypt; Admin: `frontend/src/pages/admin/` (Login, Dashboard, Profile, CrudPage, Contacts)
+- Deploy: `git push origin main` → GitHub Actions build → rsync ke VPS. **JANGAN build di server.**
+- Serving: nginx → Go; HTML `no-cache`, hashed assets `immutable` 1 tahun
+
+## Arsitektur
+- `backend/cmd/server/main.go` — entrypoint + routes (SPA catch-all HARUS paling akhir)
+- `backend/internal/` — handlers, database, middleware (JWT guard, CSRF, RateLimit, SecurityHeaders)
+- `backend/migrations/` — schema + seed SQL (005 = visitor_logs)
+- `frontend/src/pages/public/` — Home, Projects, Experience, Skills, Contact (detail per slug)
+- `frontend/src/lib/` — api client, auth context, lang.tsx (multi-lang t(en,id))
+- CMS modules: Profile · Projects · Experience · Skills · Messages — baca DB per-request (tanpa rebuild)
+- Visitor counter: middleware `handlers.VisitorCounter` + GET `/api/visitors`; PWA: `manifest.json` + `sw.js` di public/
+
+## Status Terakhir (cek 2026-08-31)
+- ⚠️ **21 file uncommitted** (13 modified + 8 untracked): visitor counter + PWA + security (CSRF/RateLimit/SecurityHeaders) SUDAH live di production tapi BELUM di-commit. Commit + push sebelum CI rebuild agar tidak hilang.
+- HEAD: `af0c41a` feat: multi-language EN/ID support (sync origin/main)
+- visitor_logs: ~881 rows, tanpa retention policy
+
+## Konvensi
+- Ponytail config FULL untuk review/audit
+- Admin CRUD: hanya whitelisted columns; login uniform error (anti user enumeration)
+- SEO meta di-inject per route dari tabel `seo_meta` oleh backend
+- Design: dark-first `#08090B`, accent `#4ADE80`, Inter + JetBrains Mono, min 44px touch target
+- Selalu update file ini saat ada perubahan struktur/status

@@ -3,16 +3,24 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import { Menu, X, Terminal } from 'lucide-react';
 
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { useLang } from '@/lib/lang';
 
 const NAV = [
-  { to: '/', label: 'Home' },
-  { to: '/projects', label: 'Projects' },
-  { to: '/experience', label: 'Experience' },
-  { to: '/skills', label: 'Skills' },
-  { to: '/contact', label: 'Contact' },
+  { to: '/', labelKey: 'home' },
+  { to: '/projects', labelKey: 'projects' },
+  { to: '/experience', labelKey: 'experience' },
+  { to: '/skills', labelKey: 'skills' },
+  { to: '/contact', labelKey: 'contact' },
 ];
 
+const LABELS = {
+  en: { home: 'Home', projects: 'Projects', experience: 'Experience', skills: 'Skills', contact: 'Contact' },
+  id: { home: 'Beranda', projects: 'Proyek', experience: 'Pengalaman', skills: 'Keahlian', contact: 'Kontak' },
+};
+
 export function PublicNav() {
+  const { lang } = useLang();
+  const labels = LABELS[lang];
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
@@ -24,7 +32,6 @@ export function PublicNav() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Close the mobile menu on navigation.
   useEffect(() => setOpen(false), [location.pathname]);
 
   return (
@@ -45,21 +52,21 @@ export function PublicNav() {
         <div className="flex items-center gap-4">
           <LanguageSwitcher />
 
-          <nav className="hidden items-center gap-7 md:flex" aria-label="Navigasi utama">
-          {NAV.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.to === '/'}
-              className={({ isActive }) =>
-                `font-mono text-[13px] transition-colors ${
-                  isActive ? 'text-accent' : 'text-mist-400 hover:text-mist-50'
-                }`
-              }
-            >
-              {item.label}
-            </NavLink>
-          ))}
+          <nav className="hidden items-center gap-7 md:flex" aria-label={lang === 'id' ? 'Navigasi utama' : 'Main navigation'}>
+            {NAV.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.to === '/'}
+                className={({ isActive }) =>
+                  `font-mono text-[13px] transition-colors ${
+                    isActive ? 'text-accent' : 'text-mist-400 hover:text-mist-50'
+                  }`
+                }
+              >
+                {labels[item.labelKey as keyof typeof labels]}
+              </NavLink>
+            ))}
           </nav>
         </div>
 
@@ -74,7 +81,7 @@ export function PublicNav() {
       </div>
 
       {open && (
-        <nav className="border-t border-ink-700 bg-ink-950 md:hidden" aria-label="Navigasi mobile">
+        <nav className="border-t border-ink-700 bg-ink-950 md:hidden" aria-label={lang === 'id' ? 'Navigasi mobile' : 'Mobile navigation'}>
           <div className="container-content flex flex-col py-2">
             {NAV.map((item) => (
               <NavLink
@@ -87,7 +94,7 @@ export function PublicNav() {
                   }`
                 }
               >
-                {item.label}
+                {labels[item.labelKey as keyof typeof labels]}
               </NavLink>
             ))}
             <div className="mt-2 px-3 py-2">

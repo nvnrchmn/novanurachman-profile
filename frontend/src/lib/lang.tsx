@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useLocation } from 'react-router-dom';
 
 type Lang = 'en' | 'id';
 
@@ -14,26 +15,48 @@ const LangContext = createContext<LangValue>({
   t: (en) => en,
 });
 
+function getLangFromURL(): Lang | null {
+  try {
+    const urlLang = new URLSearchParams(window.location.search).get('lang');
+    if (urlLang === 'id' || urlLang === 'in') return 'id';
+    if (urlLang === 'en') return 'en';
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function getStoredLang(): Lang {
+  try {
+    return (localStorage.getItem('site_lang') as Lang) || 'en';
+  } catch {
+    return 'en';
+  }
+}
+
 export function LangProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>(() => {
-    try {
-      // URL parameter takes precedence
-      const urlParams = new URLSearchParams(window.location.search);
-      const urlLang = urlParams.get('lang');
-      if (urlLang === 'id' || urlLang === 'in') return 'id';
-      return (localStorage.getItem('site_lang') as Lang) || 'en';
-    } catch {
-      return 'en';
+  const location = useLocation();
+  const [lang, setLangState] = useState<Lang>(() => getLangFromURL() || getStoredLang());
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
     }
-  });
+    const urlLang = getLangFromURL();
+    if (urlLang && urlLang !== lang) {
+      setLangState(urlLang);
+    }
+  }, [location.search]);
 
   const setLang = (l: Lang) => {
-    setLangState(l);
     try {
       localStorage.setItem('site_lang', l);
     } catch {
       /* private mode */
     }
+    setLangState(l);
   };
 
   const t = (en: string, id: string) => (lang === 'id' ? id : en);

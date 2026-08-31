@@ -16,7 +16,6 @@ import (
 )
 
 func main() {
-	// .env is optional in production (systemd can supply the environment).
 	_ = godotenv.Load()
 
 	if err := database.Connect(); err != nil {
@@ -31,9 +30,11 @@ func main() {
 
 	app.Use(recover.New())
 	app.Use(logger.New())
+	app.Use(middleware.SecurityHeaders())
+	app.Use(middleware.RateLimit())
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "https://novanurachman.my.id,http://localhost:5173",
-		AllowHeaders: "Origin,Content-Type,Accept,Authorization",
+		AllowHeaders: "Origin,Content-Type,Accept,Authorization,X-CSRF-Token",
 		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
 	}))
 
@@ -49,7 +50,10 @@ func main() {
 	api.Get("/projects/:slug", handlers.GetProjectBySlug)
 	api.Get("/experiences", handlers.ListExperiences)
 	api.Get("/skills", handlers.ListSkills)
-	api.Post("/contact", handlers.CreateContact)
+	api.Get("/visitors", handlers.GetVisitorCount)
+
+	// ---- Contact form (CSRF protected) ----
+	api.Post("/contact", middleware.CSRF(), handlers.CreateContact)
 
 	// ---- Auth ----
 	api.Post("/auth/login", handlers.Login)
@@ -80,6 +84,9 @@ func main() {
 	app.Static("/uploads", uploadDir)
 
 	app.Get("/sitemap.xml", handlers.SitemapHandler)
+
+	// Visitor counter (tracks all page views)
+	app.Use(handlers.VisitorCounter)
 
 	// Catch-all: SPA with per-route meta injection. Must stay last.
 	app.Get("/*", handlers.SPAHandler)

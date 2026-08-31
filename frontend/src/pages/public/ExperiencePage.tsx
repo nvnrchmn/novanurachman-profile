@@ -7,7 +7,7 @@ import { Reveal, SectionHeading, Spinner, EmptyState, ErrorState } from '@/compo
 import { useLang } from '@/lib/lang';
 
 export default function ExperiencePage() {
-  const { lang } = useLang();
+  const { t, lang } = useLang();
   const [items, setItems] = useState<Experience[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -27,15 +27,18 @@ export default function ExperiencePage() {
     <section className="container-content py-16">
       <Reveal>
         <SectionHeading
-          label="experience"
-          title="Pengalaman"
-          description="Perjalanan kerja dan proyek profesional."
+          label={t('experience', 'pengalaman')}
+          title={t('Experience', 'Pengalaman')}
+          description={t(
+            'Professional work and project journey.',
+            'Perjalanan kerja dan proyek profesional.'
+          )}
         />
       </Reveal>
 
       {loading && <Spinner />}
       {!loading && error && <ErrorState message={error} onRetry={load} />}
-      {!loading && !error && items.length === 0 && <EmptyState message="Belum ada data pengalaman." />}
+      {!loading && !error && items.length === 0 && <EmptyState message={t('No experience data.', 'Belum ada data pengalaman.')} />}
 
       <div className="relative">
         {items.length > 0 && (
@@ -76,7 +79,7 @@ export default function ExperiencePage() {
                 <p className="mt-1.5 font-mono text-xs text-mist-600">
                   {x.start_date}
                   {' — '}
-                  {x.is_current || !x.end_date ? 'sekarang' : x.end_date}
+                  {x.is_current || !x.end_date ? t('present', 'sekarang') : x.end_date}
                   {x.employment && ` · ${x.employment}`}
                   {x.location && ` · ${x.location}`}
                 </p>

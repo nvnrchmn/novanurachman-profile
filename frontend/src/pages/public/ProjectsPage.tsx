@@ -8,7 +8,7 @@ import { Reveal, SectionHeading, Spinner, EmptyState, ErrorState } from '@/compo
 import { useLang } from '@/lib/lang';
 
 export default function ProjectsPage() {
-  const { lang } = useLang();
+  const { t, lang } = useLang();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -28,15 +28,18 @@ export default function ProjectsPage() {
     <section className="container-content py-16">
       <Reveal>
         <SectionHeading
-          label="projects"
-          title="Proyek"
-          description="Produk dan aplikasi yang saya bangun, dari backend sampai deployment."
+          label={t('projects', 'proyek')}
+          title={t('Projects', 'Proyek')}
+          description={t(
+            'Products and applications I built, from backend to deployment.',
+            'Produk dan aplikasi yang saya bangun, dari backend sampai deployment.'
+          )}
         />
       </Reveal>
 
       {loading && <Spinner />}
       {!loading && error && <ErrorState message={error} onRetry={load} />}
-      {!loading && !error && projects.length === 0 && <EmptyState message="Belum ada proyek." />}
+      {!loading && !error && projects.length === 0 && <EmptyState message={t('No projects yet.', 'Belum ada proyek.')} />}
 
       <div className="space-y-4">
         {projects.map((p, i) => (
@@ -49,7 +52,7 @@ export default function ProjectsPage() {
                   </Link>
                 </h3>
                 <div className="flex items-center gap-3">
-                  {p.featured && <span className="mono-label">featured</span>}
+                  {p.featured && <span className="mono-label">{t('featured', 'unggulan')}</span>}
                   {p.year && <span className="font-mono text-xs text-mist-600">{p.year}</span>}
                 </div>
               </div>
@@ -60,11 +63,11 @@ export default function ProjectsPage() {
                 <div className="mt-4 flex flex-wrap gap-1.5">
                   {p.tech_stack
                     .split(',')
-                    .map((t) => t.trim())
+                    .map((tr) => tr.trim())
                     .filter(Boolean)
-                    .map((t) => (
-                      <span key={t} className="tag">
-                        {t}
+                    .map((tech) => (
+                      <span key={tech} className="tag">
+                        {tech}
                       </span>
                     ))}
                 </div>
@@ -75,7 +78,7 @@ export default function ProjectsPage() {
                   to={`/projects/${p.slug}`}
                   className="inline-flex items-center gap-1.5 font-mono text-xs text-accent"
                 >
-                  detail
+                  {t('detail', 'detail')}
                   <ArrowRight size={12} aria-hidden="true" />
                 </Link>
                 {p.live_url && (

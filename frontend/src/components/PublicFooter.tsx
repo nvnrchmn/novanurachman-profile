@@ -1,8 +1,17 @@
 import { Link } from 'react-router-dom';
 import { Github, Linkedin, Mail } from 'lucide-react';
 import type { Profile } from '@/lib/types';
+import { useLang } from '@/lib/lang';
+import { VisitorCounter } from './VisitorCounter';
+
+const LABELS = {
+  en: { builtWith: 'Built with Go & React', admin: 'admin' },
+  id: { builtWith: 'Dibangun dengan Go & React', admin: 'admin' },
+};
 
 export function PublicFooter({ profile }: { profile: Profile | null }) {
+  const { lang } = useLang();
+  const labels = LABELS[lang];
   const year = new Date().getFullYear();
 
   const socials = [
@@ -17,8 +26,11 @@ export function PublicFooter({ profile }: { profile: Profile | null }) {
         <div>
           <p className="font-mono text-sm text-mist-200">{profile?.name || 'Nova Nurachman'}</p>
           <p className="mt-1 font-mono text-xs text-mist-600">
-            © {year} · Built with Go &amp; React
+            © {year} · {labels.builtWith}
           </p>
+          <div className="mt-2">
+            <VisitorCounter />
+          </div>
         </div>
 
         <div className="flex items-center gap-3">
@@ -39,7 +51,7 @@ export function PublicFooter({ profile }: { profile: Profile | null }) {
             to="/admin"
             className="ml-1 font-mono text-xs text-mist-600 transition-colors hover:text-mist-400"
           >
-            admin
+            {labels.admin}
           </Link>
         </div>
       </div>

@@ -11,23 +11,30 @@ import {
 } from 'lucide-react';
 
 import { useAuth } from '@/lib/auth';
+import { useLang } from '@/lib/lang';
 
 const LINKS = [
-  { to: '/admin', label: 'Dashboard', Icon: LayoutDashboard, end: true },
-  { to: '/admin/profile', label: 'Profile', Icon: User },
-  { to: '/admin/projects', label: 'Projects', Icon: FolderKanban },
-  { to: '/admin/experiences', label: 'Experience', Icon: Briefcase },
-  { to: '/admin/skills', label: 'Skills', Icon: Wrench },
-  { to: '/admin/contacts', label: 'Messages', Icon: Mail },
+  { to: '/admin', labelKey: 'dashboard', Icon: LayoutDashboard, end: true },
+  { to: '/admin/profile', labelKey: 'profile', Icon: User },
+  { to: '/admin/projects', labelKey: 'projects', Icon: FolderKanban },
+  { to: '/admin/experiences', labelKey: 'experience', Icon: Briefcase },
+  { to: '/admin/skills', labelKey: 'skills', Icon: Wrench },
+  { to: '/admin/contacts', labelKey: 'messages', Icon: Mail },
 ];
+
+const LABELS = {
+  en: { dashboard: 'Dashboard', profile: 'Profile', projects: 'Projects', experience: 'Experience', skills: 'Skills', messages: 'Messages', viewSite: 'view site', logout: 'logout' },
+  id: { dashboard: 'Dasbor', profile: 'Profil', projects: 'Proyek', experience: 'Pengalaman', skills: 'Keahlian', messages: 'Pesan', viewSite: 'lihat situs', logout: 'keluar' },
+};
 
 export function AdminLayout() {
   const { user, logout } = useAuth();
+  const { lang } = useLang();
+  const labels = LABELS[lang];
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
-    // Send the admin to the public site, not back to the login form.
     navigate('/', { replace: true });
   };
 
@@ -44,7 +51,7 @@ export function AdminLayout() {
               href="/"
               className="inline-flex min-h-[40px] items-center gap-1.5 rounded-md px-3 font-mono text-xs text-mist-400 hover:text-accent"
             >
-              lihat situs
+              {labels.viewSite}
               <ExternalLink size={12} aria-hidden="true" />
             </a>
             <button
@@ -52,7 +59,7 @@ export function AdminLayout() {
               className="inline-flex min-h-[40px] items-center gap-1.5 rounded-md border border-ink-700 px-3 font-mono text-xs text-mist-400 hover:border-red-500/40 hover:text-red-300"
             >
               <LogOut size={13} aria-hidden="true" />
-              logout
+              {labels.logout}
             </button>
           </div>
         </div>
@@ -60,8 +67,8 @@ export function AdminLayout() {
 
       <div className="mx-auto flex max-w-6xl gap-8 px-5 py-8">
         <aside className="hidden w-48 shrink-0 md:block">
-          <nav className="space-y-1" aria-label="Menu admin">
-            {LINKS.map(({ to, label, Icon, end }) => (
+          <nav className="space-y-1" aria-label={lang === 'id' ? 'Menu admin' : 'Admin menu'}>
+            {LINKS.map(({ to, labelKey, Icon, end }) => (
               <NavLink
                 key={to}
                 to={to}
@@ -75,7 +82,7 @@ export function AdminLayout() {
                 }
               >
                 <Icon size={15} aria-hidden="true" />
-                {label}
+                {labels[labelKey as keyof typeof labels]}
               </NavLink>
             ))}
           </nav>
@@ -85,29 +92,6 @@ export function AdminLayout() {
           <Outlet />
         </main>
       </div>
-
-      {/* Mobile bottom nav — 6 items would be too many, so Messages is last. */}
-      <nav
-        className="fixed bottom-0 left-0 right-0 z-40 flex border-t border-ink-700 bg-ink-950/95 backdrop-blur md:hidden"
-        aria-label="Menu admin mobile"
-      >
-        {LINKS.slice(0, 5).map(({ to, label, Icon, end }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={end}
-            className={({ isActive }) =>
-              `flex flex-1 flex-col items-center justify-center gap-1 py-2.5 ${
-                isActive ? 'text-accent' : 'text-mist-600'
-              }`
-            }
-          >
-            <Icon size={17} aria-hidden="true" />
-            <span className="font-mono text-[10px]">{label}</span>
-          </NavLink>
-        ))}
-      </nav>
-      <div className="h-16 md:hidden" aria-hidden="true" />
     </div>
   );
 }
