@@ -23,6 +23,7 @@ const DashboardPage = lazy(() => import('@/pages/admin/DashboardPage'));
 const AdminProfilePage = lazy(() => import('@/pages/admin/ProfilePage'));
 const ContactsPage = lazy(() => import('@/pages/admin/ContactsPage'));
 const PostsPage = lazy(() => import('@/pages/admin/PostsPage'));
+const AnalyticsPage = lazy(() => import('@/pages/admin/AnalyticsPage'));
 
 function Fallback() {
   return (
@@ -94,6 +95,7 @@ export default function App() {
             <Route path="profile" element={<AdminProfilePage />} />
             <Route path="contacts" element={<ContactsPage />} />
             <Route path="posts" element={<PostsPage />} />
+            <Route path="analytics" element={<AnalyticsPage />} />
 
             <Route
               path="projects"

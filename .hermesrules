@@ -17,11 +17,12 @@
 - CMS modules: Profile · Projects · Experience · Skills · Messages — baca DB per-request (tanpa rebuild)
 - Visitor counter: middleware `handlers.VisitorCounter` + GET `/api/visitors`; PWA: `manifest.json` + `sw.js` di public/
 
-## Status Terakhir (cek 2026-08-31)
-- ✅ Blog module live: tabel `posts` (006_posts.sql), `/api/posts`, `/api/posts/:slug`, RSS `/feed.xml` (goldmark), sitemap + SEO meta per post, admin CRUD di `/admin/posts` (tab EN/ID + preview markdown + publish terjadwal), halaman publik `/blog` + `/blog/:slug`. Deps: `marked` + `dompurify` (frontend), `goldmark` (backend).
-- ⚠️ **Timezone fix penting**: DSN pakai `loc=Asia/Jakarta` — tanpanya semua TIMESTAMP bergeser +7 jam (parseTime=true default-nya UTC). Jangan hapus.
-- Admin layout: sidebar grouped desktop + bottom nav mobile (5 slot, "Lainnya" = sheet).
-- HEAD: commit blog sprint (lihat git log). visitor_logs: ~881 rows, tanpa retention policy.
+## Status Terakhir (cek 2026-09-01)
+- ✅ Analytics dashboard live: `/api/admin/analytics?days=N` (summary, daily, top pages, referrer by host, devices, browsers) + halaman `/admin/analytics` (stat cards, SVG bar chart daily, toggle kunjungan/pengunjung, range 7/14/30).
+- ✅ **Visitor tracking fix**: `realIP()` baca X-Forwarded-For/X-Real-IP (sebelumnya semua = 127.0.0.1 → unique visitor rusak). Middleware + query analytics filter bot UA, aset (`.js/.css/...`), dan path serangan (wp-*, wordpress, xmlrpc, phpmyadmin, .env/.git, dsb). Pola filter ada di `cleanWhere` (analytics.go) & `attackPathRe` (visitor.go) — **jaga konsisten keduanya**.
+- ⚠️ Catatan: data historis (sebelum fix IP) punya unique-visitor=1; angka unik baru akurat untuk kunjungan baru.
+- ✅ Blog module live (lihat status sebelumnya). Admin layout: sidebar grouped + bottom nav mobile.
+- HEAD: commit sprint 2 (lihat git log). visitor_logs: tanpa retention policy.
 - Ponytail config FULL untuk review/audit
 - Admin CRUD: hanya whitelisted columns; login uniform error (anti user enumeration)
 - SEO meta di-inject per route dari tabel `seo_meta` oleh backend

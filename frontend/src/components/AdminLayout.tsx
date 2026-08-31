@@ -10,6 +10,7 @@ import {
   LogOut,
   ExternalLink,
   FileText,
+  BarChart3,
   MoreHorizontal,
   Terminal,
   X,
@@ -33,7 +34,10 @@ interface NavGroup {
 const GROUPS: NavGroup[] = [
   {
     titleKey: 'main',
-    items: [{ to: '/admin', labelKey: 'dashboard', Icon: LayoutDashboard, end: true }],
+    items: [
+      { to: '/admin', labelKey: 'dashboard', Icon: LayoutDashboard, end: true },
+      { to: '/admin/analytics', labelKey: 'analytics', Icon: BarChart3 },
+    ],
   },
   {
     titleKey: 'content',
@@ -59,6 +63,7 @@ const LABELS: Record<string, Record<string, string>> = {
     content: 'Content',
     other: 'Other',
     dashboard: 'Dashboard',
+    analytics: 'Analytics',
     blog: 'Blog',
     projects: 'Projects',
     experience: 'Experience',
@@ -74,6 +79,7 @@ const LABELS: Record<string, Record<string, string>> = {
     content: 'Konten',
     other: 'Lainnya',
     dashboard: 'Dasbor',
+    analytics: 'Analytics',
     blog: 'Blog',
     projects: 'Proyek',
     experience: 'Pengalaman',
@@ -96,6 +102,7 @@ const BOTTOM_NAV: NavItem[] = [
 ];
 
 const MORE_ITEMS: NavItem[] = [
+  { to: '/admin/analytics', labelKey: 'analytics', Icon: BarChart3 },
   { to: '/admin/experiences', labelKey: 'experience', Icon: Briefcase },
   { to: '/admin/skills', labelKey: 'skills', Icon: Wrench },
   { to: '/admin/profile', labelKey: 'profile', Icon: User },

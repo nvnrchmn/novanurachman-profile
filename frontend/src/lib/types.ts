@@ -81,3 +81,34 @@ export interface Stats {
   contacts: number;
   contacts_unread: number;
 }
+
+export interface AnalyticsSummary {
+  total_views: number;
+  total_visitors: number;
+  views_today: number;
+  visitors_today: number;
+  views_7d: number;
+  views_prev_7d: number;
+  delta_7d: number;
+}
+
+export interface DailyPoint {
+  date: string;
+  views: number;
+  visitors: number;
+}
+
+export interface CountItem {
+  page?: string;
+  host?: string;
+  views: number;
+}
+
+export interface AnalyticsData {
+  summary: AnalyticsSummary;
+  daily: DailyPoint[];
+  pages: CountItem[];
+  referrers: CountItem[];
+  devices: Record<string, number>;
+  browsers: Record<string, number>;
+}

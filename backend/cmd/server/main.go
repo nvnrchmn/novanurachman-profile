@@ -64,6 +64,7 @@ func main() {
 	admin := api.Group("/admin", middleware.Protected())
 	admin.Get("/me", handlers.Me)
 	admin.Get("/stats", handlers.Stats)
+	admin.Get("/analytics", handlers.Analytics)
 
 	admin.Put("/profile", handlers.UpsertProfile)
 
