@@ -20,11 +20,21 @@ CREATE TABLE IF NOT EXISTS posts (
   INDEX idx_posts_pub (is_published, deleted_at, published_at)
 ) ENGINE=InnoDB;
 
-INSERT IGNORE INTO seo_meta (id, path, title, description, og_image) VALUES
-('sm-6', '/blog',
- 'Blog — Nova Nurachman',
- 'Tulisan tentang pengembangan web, infrastruktur, dan pengalaman teknis.',
- '/og-image.jpg');
+-- Blog routes' SEO meta (en + id). Ids sm-11/sm-12: sm-6..sm-10 were already
+-- taken by the bilingual rows of earlier routes.
+INSERT INTO seo_meta (id, path, lang, title, description, og_image)
+SELECT 'sm-11', '/blog', 'en',
+       'Blog — Nova Nurachman',
+       'Notes on web development, infrastructure, and what I build.',
+       '/og-image.jpg'
+WHERE NOT EXISTS (SELECT 1 FROM seo_meta WHERE path = '/blog' AND lang = 'en');
+
+INSERT INTO seo_meta (id, path, lang, title, description, og_image)
+SELECT 'sm-12', '/blog', 'id',
+       'Blog — Nova Nurachman',
+       'Tulisan tentang pengembangan web, infrastruktur, dan pengalaman teknis.',
+       '/og-image.jpg'
+WHERE NOT EXISTS (SELECT 1 FROM seo_meta WHERE path = '/blog' AND lang = 'id');
 
 -- Sample post so the blog is alive from day one and proves the pipeline end to end.
 INSERT INTO posts (id, slug, title_en, title_id, excerpt_en, excerpt_id,
