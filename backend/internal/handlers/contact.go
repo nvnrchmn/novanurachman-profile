@@ -124,10 +124,12 @@ func Stats(c *fiber.Ctx) error {
 		return n
 	}
 	return c.JSON(fiber.Map{"success": true, "data": fiber.Map{
-		"projects":       count("SELECT COUNT(*) FROM projects WHERE deleted_at IS NULL"),
-		"experiences":    count("SELECT COUNT(*) FROM experiences WHERE deleted_at IS NULL"),
-		"skills":         count("SELECT COUNT(*) FROM skills WHERE deleted_at IS NULL"),
-		"contacts":       count("SELECT COUNT(*) FROM contacts"),
+		"projects":        count("SELECT COUNT(*) FROM projects WHERE deleted_at IS NULL"),
+		"experiences":     count("SELECT COUNT(*) FROM experiences WHERE deleted_at IS NULL"),
+		"skills":          count("SELECT COUNT(*) FROM skills WHERE deleted_at IS NULL"),
+		"posts":           count("SELECT COUNT(*) FROM posts WHERE deleted_at IS NULL"),
+		"posts_published": count("SELECT COUNT(*) FROM posts WHERE deleted_at IS NULL AND is_published = 1"),
+		"contacts":        count("SELECT COUNT(*) FROM contacts"),
 		"contacts_unread": count("SELECT COUNT(*) FROM contacts WHERE is_read = 0"),
 	}})
 }

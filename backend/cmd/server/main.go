@@ -50,6 +50,8 @@ func main() {
 	api.Get("/projects/:slug", handlers.GetProjectBySlug)
 	api.Get("/experiences", handlers.ListExperiences)
 	api.Get("/skills", handlers.ListSkills)
+	api.Get("/posts", handlers.ListPosts)
+	api.Get("/posts/:slug", handlers.GetPostBySlug)
 	api.Get("/visitors", handlers.GetVisitorCount)
 
 	// ---- Contact form (CSRF protected) ----
@@ -65,7 +67,7 @@ func main() {
 
 	admin.Put("/profile", handlers.UpsertProfile)
 
-	for _, res := range []string{"projects", "experiences", "skills"} {
+	for _, res := range []string{"posts", "projects", "experiences", "skills"} {
 		admin.Get("/"+res, handlers.AdminList(res))
 		admin.Post("/"+res, handlers.AdminCreate(res))
 		admin.Put("/"+res+"/:id", handlers.AdminUpdate(res))
@@ -84,6 +86,7 @@ func main() {
 	app.Static("/uploads", uploadDir)
 
 	app.Get("/sitemap.xml", handlers.SitemapHandler)
+	app.Get("/feed.xml", handlers.FeedHandler)
 
 	// Visitor counter (tracks all page views)
 	app.Use(handlers.VisitorCounter)

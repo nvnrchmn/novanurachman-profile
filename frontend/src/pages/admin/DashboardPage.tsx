@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FolderKanban, Briefcase, Wrench, Mail } from 'lucide-react';
+import { FolderKanban, Briefcase, Wrench, Mail, FileText } from 'lucide-react';
 
 import { apiData } from '@/lib/api';
 import type { Stats } from '@/lib/types';
@@ -36,13 +36,23 @@ export default function DashboardPage() {
       to: '/admin/contacts',
       Icon: Mail,
     },
+    {
+      label: 'Blog',
+      value: stats?.posts ?? 0,
+      badge:
+        stats && stats.posts > 0 && stats.posts_published === stats.posts
+          ? 0
+          : (stats?.posts ?? 0) - (stats?.posts_published ?? 0),
+      to: '/admin/posts',
+      Icon: FileText,
+    },
   ];
 
   return (
     <div>
       <h1 className="mb-6 text-xl font-medium text-mist-50">Dashboard</h1>
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
         {cards.map(({ label, value, badge, to, Icon }) => (
           <Link key={label} to={to} className="card card-hover p-5">
             <div className="mb-3 flex items-center justify-between">

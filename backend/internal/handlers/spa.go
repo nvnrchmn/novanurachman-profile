@@ -102,6 +102,34 @@ func metaForPath(path, lang string) pageMeta {
 		}
 	}
 
+	// Blog posts take their meta from the post itself.
+	if strings.HasPrefix(path, "/blog/") {
+		slug := strings.TrimPrefix(path, "/blog/")
+		slug = strings.Trim(slug, "/")
+		if slug != "" && !strings.Contains(slug, "/") {
+			var titleEn, titleId sql.NullString
+			var excerpt, cover sql.NullString
+			err := database.DB.QueryRow(`
+				SELECT title_en, title_id, excerpt_en, cover_image FROM posts
+				WHERE slug = ? AND is_published = 1 AND deleted_at IS NULL LIMIT 1
+			`, slug).Scan(&titleEn, &titleId, &excerpt, &cover)
+			if err == nil {
+				if lang == "id" && titleId.Valid && titleId.String != "" {
+					meta.Title = titleId.String + " — Nova Nurachman"
+				} else {
+					meta.Title = titleEn.String + " — Nova Nurachman"
+				}
+				if excerpt.Valid && excerpt.String != "" {
+					meta.Description = excerpt.String
+				}
+				if cover.Valid && cover.String != "" {
+					meta.OGImage = cover.String
+				}
+				return meta
+			}
+		}
+	}
+
 	// Static routes come from the seo_meta table so they are editable in the CMS.
 	var title, desc, og sql.NullString
 	err := database.DB.QueryRow(
@@ -231,7 +259,7 @@ func SitemapHandler(c *fiber.Ctx) error {
 	}
 
 	add("/", "1.0")
-	for _, p := range []string{"/projects", "/experience", "/skills", "/contact"} {
+	for _, p := range []string{"/projects", "/blog", "/experience", "/skills", "/contact"} {
 		add(p, "0.8")
 	}
 
@@ -245,6 +273,21 @@ func SitemapHandler(c *fiber.Ctx) error {
 			var slug string
 			if rows.Scan(&slug) == nil {
 				add("/projects/"+slug, "0.7")
+			}
+		}
+	}
+
+	postRows, err := database.DB.Query(`
+		SELECT slug FROM posts
+		WHERE is_published = 1 AND deleted_at IS NULL
+		  AND (published_at IS NULL OR published_at <= NOW())
+	`)
+	if err == nil {
+		defer postRows.Close()
+		for postRows.Next() {
+			var slug string
+			if postRows.Scan(&slug) == nil {
+				add("/blog/"+slug, "0.7")
 			}
 		}
 	}

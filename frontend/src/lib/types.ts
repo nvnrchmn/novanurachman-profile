@@ -51,6 +51,17 @@ export interface Skill {
   icon: string;
 }
 
+export interface Post {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  cover_image: string;
+  tags: string;
+  published_at: string;
+}
+
 export interface ContactMessage {
   id: string;
   name: string;
@@ -65,6 +76,8 @@ export interface Stats {
   projects: number;
   experiences: number;
   skills: number;
+  posts: number;
+  posts_published: number;
   contacts: number;
   contacts_unread: number;
 }

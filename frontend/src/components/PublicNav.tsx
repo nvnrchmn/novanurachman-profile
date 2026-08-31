@@ -10,12 +10,13 @@ const NAV = [
   { to: '/projects', labelKey: 'projects' },
   { to: '/experience', labelKey: 'experience' },
   { to: '/skills', labelKey: 'skills' },
+  { to: '/blog', labelKey: 'blog' },
   { to: '/contact', labelKey: 'contact' },
 ];
 
 const LABELS = {
-  en: { home: 'Home', projects: 'Projects', experience: 'Experience', skills: 'Skills', contact: 'Contact' },
-  id: { home: 'Beranda', projects: 'Proyek', experience: 'Pengalaman', skills: 'Keahlian', contact: 'Kontak' },
+  en: { home: 'Home', projects: 'Projects', experience: 'Experience', skills: 'Skills', blog: 'Blog', contact: 'Contact' },
+  id: { home: 'Beranda', projects: 'Proyek', experience: 'Pengalaman', skills: 'Keahlian', blog: 'Blog', contact: 'Kontak' },
 };
 
 export function PublicNav() {

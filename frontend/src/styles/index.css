@@ -75,6 +75,99 @@
     @apply inline-flex items-center rounded border border-ink-700 bg-ink-900
            px-2 py-1 font-mono text-[11px] text-mist-400;
   }
+
+  /* Typography for rendered blog markdown */
+  .markdown-body {
+    @apply text-[15px] leading-[1.85] text-mist-200;
+  }
+
+  .markdown-body > *:first-child {
+    margin-top: 0;
+  }
+
+  .markdown-body h1,
+  .markdown-body h2,
+  .markdown-body h3,
+  .markdown-body h4 {
+    @apply mt-10 mb-4 font-semibold tracking-tight text-mist-50;
+    scroll-margin-top: 5rem;
+  }
+
+  .markdown-body h1 {
+    @apply text-2xl;
+  }
+
+  .markdown-body h2 {
+    @apply border-b border-ink-700 pb-2 text-xl;
+  }
+
+  .markdown-body h3 {
+    @apply text-lg;
+  }
+
+  .markdown-body h4 {
+    @apply text-base;
+  }
+
+  .markdown-body p {
+    @apply mb-5;
+  }
+
+  .markdown-body a {
+    @apply text-accent underline decoration-accent/40 underline-offset-4 transition-colors hover:decoration-accent;
+  }
+
+  .markdown-body strong {
+    @apply font-semibold text-mist-50;
+  }
+
+  .markdown-body ul {
+    @apply mb-5 list-disc space-y-1.5 pl-6;
+  }
+
+  .markdown-body ol {
+    @apply mb-5 list-decimal space-y-1.5 pl-6;
+  }
+
+  .markdown-body li::marker {
+    color: #4ade80;
+  }
+
+  .markdown-body blockquote {
+    @apply mb-5 border-l-2 border-accent/50 bg-ink-900/60 py-3 pl-5 pr-4 italic text-mist-400;
+  }
+
+  .markdown-body code {
+    @apply rounded border border-ink-700 bg-ink-900 px-1.5 py-0.5 font-mono text-[13px] text-accent;
+  }
+
+  .markdown-body pre {
+    @apply mb-6 overflow-x-auto rounded-lg border border-ink-700 bg-ink-900 p-4;
+  }
+
+  .markdown-body pre code {
+    @apply border-0 bg-transparent p-0 text-[13px] leading-relaxed text-mist-200;
+  }
+
+  .markdown-body img {
+    @apply my-6 rounded-lg border border-ink-700;
+  }
+
+  .markdown-body hr {
+    @apply my-10 border-ink-700;
+  }
+
+  .markdown-body table {
+    @apply mb-6 w-full border-collapse text-sm;
+  }
+
+  .markdown-body th {
+    @apply border border-ink-700 bg-ink-900 px-3 py-2 text-left font-mono text-xs font-normal text-mist-400;
+  }
+
+  .markdown-body td {
+    @apply border border-ink-700 px-3 py-2 text-mist-200;
+  }
 }
 
 /* Respect users who ask for less motion. */

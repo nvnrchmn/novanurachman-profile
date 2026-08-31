@@ -13,13 +13,26 @@ import (
 // Whitelisting (rather than trusting the payload) prevents SQL injection via
 // column names and stops clients from writing internal fields.
 type tableSpec struct {
-	table   string
-	prefix  string
-	columns []string
-	soft    bool // has deleted_at
+	table       string
+	prefix      string
+	columns     []string
+	soft        bool   // has deleted_at
+	nullIfEmpty []string // empty-string values are stored as NULL
 }
 
 var specs = map[string]tableSpec{
+	"posts": {
+		table:  "posts",
+		prefix: "po",
+		columns: []string{
+			"title_en", "title_id", "slug",
+			"excerpt_en", "excerpt_id",
+			"content_en", "content_id",
+			"cover_image", "tags", "is_published", "published_at",
+		},
+		soft:        true,
+		nullIfEmpty: []string{"published_at"},
+	},
 	"projects": {
 		table:  "projects",
 		prefix: "pj",
@@ -69,6 +82,22 @@ func isBoolCol(col string) bool {
 		return true
 	}
 	return false
+}
+
+// contains reports whether a slice holds the given string.
+func contains(list []string, s string) bool {
+	for _, v := range list {
+		if v == s {
+			return true
+		}
+	}
+	return false
+}
+
+// emptyVal reports whether a decoded JSON value is an empty/whitespace string.
+func emptyVal(v interface{}) bool {
+	s, ok := v.(string)
+	return ok && strings.TrimSpace(s) == ""
 }
 
 // AdminList returns every row (including unpublished) for the CMS table.
@@ -143,6 +172,8 @@ func AdminCreate(resource string) fiber.Handler {
 				holders = append(holders, "?")
 				if isBoolCol(col) {
 					args = append(args, boolish(v))
+				} else if contains(spec.nullIfEmpty, col) && emptyVal(v) {
+					args = append(args, nil)
 				} else {
 					args = append(args, v)
 				}
@@ -179,6 +210,8 @@ func AdminUpdate(resource string) fiber.Handler {
 				sets = append(sets, col+" = ?")
 				if isBoolCol(col) {
 					args = append(args, boolish(v))
+				} else if contains(spec.nullIfEmpty, col) && emptyVal(v) {
+					args = append(args, nil)
 				} else {
 					args = append(args, v)
 				}
