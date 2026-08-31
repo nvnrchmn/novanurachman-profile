@@ -18,6 +18,7 @@ type tableSpec struct {
 	columns     []string
 	soft        bool   // has deleted_at
 	nullIfEmpty []string // empty-string values are stored as NULL
+	orderBy     string // default: order_no ASC, id DESC
 }
 
 var specs = map[string]tableSpec{
@@ -32,6 +33,7 @@ var specs = map[string]tableSpec{
 		},
 		soft:        true,
 		nullIfEmpty: []string{"published_at"},
+		orderBy:     "COALESCE(published_at, created_at) DESC, id DESC",
 	},
 	"projects": {
 		table:  "projects",
@@ -113,8 +115,12 @@ func AdminList(resource string) fiber.Handler {
 		if spec.soft {
 			where = "WHERE deleted_at IS NULL"
 		}
-		q := fmt.Sprintf("SELECT %s FROM %s %s ORDER BY order_no ASC, id DESC",
-			strings.Join(cols, ", "), spec.table, where)
+		orderBy := spec.orderBy
+		if orderBy == "" {
+			orderBy = "order_no ASC, id DESC"
+		}
+		q := fmt.Sprintf("SELECT %s FROM %s %s ORDER BY %s",
+			strings.Join(cols, ", "), spec.table, where, orderBy)
 
 		rows, err := database.DB.Query(q)
 		if err != nil {
