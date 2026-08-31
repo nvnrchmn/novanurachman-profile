@@ -1,5 +1,3 @@
-import { getToken } from './auth';
-
 const TOKEN_KEY = 'nova_admin_token';
 
 export function getToken(): string | null {
