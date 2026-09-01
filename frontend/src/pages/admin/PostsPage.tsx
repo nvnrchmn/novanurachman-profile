@@ -12,6 +12,13 @@ interface Category {
   slug: string;
 }
 
+interface TagItem {
+  id: string;
+  name: string;
+  slug: string;
+  color: string;
+}
+
 interface PostRow {
   id: string;
   title_en: string;
@@ -83,6 +90,8 @@ export default function PostsPage() {
   const { t } = useLang();
   const [rows, setRows] = useState<PostRow[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [allTags, setAllTags] = useState<TagItem[]>([]);
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [open, setOpen] = useState(false);
@@ -102,6 +111,15 @@ export default function PostsPage() {
     }
   };
 
+  const loadTags = async () => {
+    try {
+      const data = await apiData<TagItem[]>('/tags');
+      if (data) setAllTags(data);
+    } catch (e) {
+      // ignore
+    }
+  };
+
   const load = () => {
     setLoading(true);
     setError('');
@@ -113,12 +131,14 @@ export default function PostsPage() {
 
   useEffect(() => {
     loadCategories();
+    loadTags();
     load();
   }, []);
 
   const openCreate = () => {
     setForm({ ...BLANK });
     setEditing(null);
+    setSelectedTagIds([]);
     setTab('en');
     setPreview(false);
     setFormError('');
@@ -138,6 +158,10 @@ export default function PostsPage() {
     }
     setForm(filled);
     setEditing(row);
+    setSelectedTagIds([]);
+    apiData<TagItem[]>(`/posts/${row.slug}/tags`)
+      .then((d) => setSelectedTagIds((d || []).map((tg) => tg.id)))
+      .catch(() => setSelectedTagIds([]));
     setTab('en');
     setPreview(false);
     setFormError('');
@@ -182,6 +206,7 @@ export default function PostsPage() {
 
     setSaving(true);
     try {
+      let postId = editing ? editing.id : '';
       if (editing) {
         await api(`/admin/posts/${editing.id}`, {
           method: 'PUT',
@@ -189,7 +214,19 @@ export default function PostsPage() {
           body: JSON.stringify(payload),
         });
       } else {
-        await api('/admin/posts', { method: 'POST', auth: true, body: JSON.stringify(payload) });
+        const created = await api<{ id?: string }>('/admin/posts', {
+          method: 'POST',
+          auth: true,
+          body: JSON.stringify(payload),
+        });
+        postId = created?.id || '';
+      }
+      if (postId) {
+        await api(`/admin/posts/${postId}/tags`, {
+          method: 'PUT',
+          auth: true,
+          body: JSON.stringify({ tag_ids: selectedTagIds }),
+        });
       }
       setOpen(false);
       load();
@@ -452,15 +489,43 @@ export default function PostsPage() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label htmlFor="f-tags" className="mb-1.5 block font-mono text-xs text-mist-400">
-                    Tags
+                    Tag
                   </label>
-                  <input
-                    id="f-tags"
-                    className="input"
-                    placeholder="Go, React, DevOps"
-                    value={form.tags ?? ''}
-                    onChange={(e) => set('tags', e.target.value)}
-                  />
+                  {allTags.length === 0 ? (
+                    <p className="text-xs text-mist-500">
+                      Belum ada tag — buat dulu di menu Tags.
+                    </p>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {allTags.map((tag) => {
+                        const on = selectedTagIds.includes(tag.id);
+                        return (
+                          <button
+                            key={tag.id}
+                            type="button"
+                            onClick={() =>
+                              setSelectedTagIds(
+                                on
+                                  ? selectedTagIds.filter((x) => x !== tag.id)
+                                  : [...selectedTagIds, tag.id]
+                              )
+                            }
+                            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                              on
+                                ? 'border-accent/60 bg-accent/15 text-accent'
+                                : 'border-ink-700 text-mist-400 hover:border-mist-500 hover:text-mist-200'
+                            }`}
+                          >
+                            <span
+                              className="h-2 w-2 rounded-full"
+                              style={{ backgroundColor: tag.color || '#4ADE80' }}
+                            />
+                            {tag.name}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
 

@@ -193,7 +193,8 @@ func AdminCreate(resource string) fiber.Handler {
 
 		cols := []string{"id"}
 		holders := []string{"?"}
-		args := []interface{}{newID(spec.prefix)}
+		id := newID(spec.prefix)
+		args := []interface{}{id}
 
 		for _, col := range spec.columns {
 			if v, ok := body[col]; ok {
@@ -215,7 +216,7 @@ func AdminCreate(resource string) fiber.Handler {
 		if _, err := database.DB.Exec(q, args...); err != nil {
 			return c.Status(500).JSON(fiber.Map{"success": false, "message": err.Error()})
 		}
-		return c.Status(201).JSON(fiber.Map{"success": true})
+		return c.Status(201).JSON(fiber.Map{"success": true, "id": id})
 	}
 }
 
@@ -258,6 +259,48 @@ func AdminUpdate(resource string) fiber.Handler {
 		}
 		return c.JSON(fiber.Map{"success": true})
 	}
+}
+
+// AdminSetPostTags replaces the tag set of a post (post_tags junction).
+func AdminSetPostTags(c *fiber.Ctx) error {
+	var body struct {
+		TagIDs []string `json:"tag_ids"`
+	}
+	if err := c.BodyParser(&body); err != nil {
+		return c.Status(400).JSON(fiber.Map{"success": false, "message": "Payload tidak valid"})
+	}
+
+	postID := c.Params("id")
+	var n int
+	if err := database.DB.QueryRow(
+		`SELECT COUNT(*) FROM posts WHERE id = ? AND deleted_at IS NULL`, postID,
+	).Scan(&n); err != nil || n == 0 {
+		return c.Status(404).JSON(fiber.Map{"success": false, "message": "Postingan tidak ditemukan"})
+	}
+
+	tx, err := database.DB.Begin()
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"success": false, "message": "Kesalahan server"})
+	}
+	defer tx.Rollback()
+
+	if _, err := tx.Exec(`DELETE FROM post_tags WHERE post_id = ?`, postID); err != nil {
+		return c.Status(500).JSON(fiber.Map{"success": false, "message": err.Error()})
+	}
+	for _, tid := range body.TagIDs {
+		if tid == "" {
+			continue
+		}
+		if _, err := tx.Exec(
+			`INSERT IGNORE INTO post_tags (post_id, tag_id) VALUES (?, ?)`, postID, tid,
+		); err != nil {
+			return c.Status(500).JSON(fiber.Map{"success": false, "message": err.Error()})
+		}
+	}
+	if err := tx.Commit(); err != nil {
+		return c.Status(500).JSON(fiber.Map{"success": false, "message": err.Error()})
+	}
+	return c.JSON(fiber.Map{"success": true})
 }
 
 // AdminDelete soft-deletes when the table supports it.

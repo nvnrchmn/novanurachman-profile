@@ -79,6 +79,8 @@ func main() {
 		admin.Delete("/"+res+"/:id", handlers.AdminDelete(res))
 	}
 
+	admin.Put("/posts/:id/tags", handlers.AdminSetPostTags)
+
 	admin.Get("/contacts", handlers.ListContacts)
 	admin.Put("/contacts/:id/read", handlers.MarkContactRead)
 	admin.Delete("/contacts/:id", handlers.DeleteContact)
