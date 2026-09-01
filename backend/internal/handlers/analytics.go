@@ -39,8 +39,11 @@ func Analytics(c *fiber.Ctx) error {
 	}
 
 	summary := fiber.Map{
-		"total_views":    sum("SELECT COUNT(*) FROM visitor_logs " + cleanWhere),
-		"total_visitors": sum("SELECT COUNT(DISTINCT ip_address) FROM visitor_logs " + cleanWhere),
+		// Lifetime = stats harian (riwayat lama yang sudah dipurge) + raw dalam window retention.
+		"total_views": sum("SELECT COUNT(*) FROM visitor_logs "+cleanWhere) +
+			sum("SELECT COALESCE(SUM(visits), 0) FROM visitor_stats_daily"),
+		"total_visitors": sum("SELECT COUNT(DISTINCT ip_address) FROM visitor_logs "+cleanWhere) +
+			sum("SELECT COALESCE(SUM(unique_visitors), 0) FROM visitor_stats_daily"),
 		"views_today": sum(`SELECT COUNT(*) FROM visitor_logs `+cleanWhere+`
 			AND created_at >= CURDATE()`),
 		"visitors_today": sum(`SELECT COUNT(DISTINCT ip_address) FROM visitor_logs `+cleanWhere+`
