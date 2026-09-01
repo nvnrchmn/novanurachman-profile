@@ -26,7 +26,8 @@
 - ✅ Analytics dashboard + visitor tracking fix (lihat status sebelumnya).
 - ⚠️ Catatan: data historis (sebelum fix IP) punya unique-visitor=1.
 - ✅ **Admin CRUD categories/tags**: `specs` baru di admin.go (categories: prefix cat-, soft, orderBy sort_order, `onDelete` → lepas posts.category_id; tags: prefix tag-, soft, orderBy name, `onDelete` → hapus post_tags), route `/api/admin/categories|tags` via loop CRUD generik, halaman `/admin/categories` & `/admin/tags` (CrudPage), sidebar + mobile more-sheet + label EN/ID.
-- ⚠️ **Belum ada**: visitor_logs: tanpa retention policy.
+- ✅ **Assign tag ke post dari admin**: endpoint baru `PUT /api/admin/posts/:id/tags` (replace post_tags, transaksi); PostsPage pakai chip multi-select (bukan input teks legacy); `AdminCreate` kini return `id`; edit memuat tag post via `/posts/:slug/tags`.
+- ✅ Investigasi `GET /api/admin/me` 401: **bukan bug** — handler `Me` validasi `sub` JWT ke tabel `users` (token uji sub="test" ditolak, sub user asli `us-1` → 200). Login flow normal issue token dengan sub user nyata.
 - HEAD: commit sprint 3 (lihat git log).
 - Ponytail config FULL untuk review/audit
 - Admin CRUD: hanya whitelisted columns; login uniform error (anti user enumeration)
