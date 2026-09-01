@@ -25,7 +25,8 @@
 - ✅ **sw.js v2**: CACHE_NAME v2, install hanya cache '/' + '/index.html' (asset Vite hashed → runtime cache; STATIC_ASSETS non-hashed dulu menyebabkan install SW gagal), API network-first + fallback cache, navigasi network-first → fallback '/', aset static cache-first.
 - ✅ Analytics dashboard + visitor tracking fix (lihat status sebelumnya).
 - ⚠️ Catatan: data historis (sebelum fix IP) punya unique-visitor=1.
-- ⚠️ **Belum ada**: admin CRUD untuk categories/tags (kelola via SQL dulu: `INSERT INTO categories/tags` + `post_tags`). visitor_logs: tanpa retention policy.
+- ✅ **Admin CRUD categories/tags**: `specs` baru di admin.go (categories: prefix cat-, soft, orderBy sort_order, `onDelete` → lepas posts.category_id; tags: prefix tag-, soft, orderBy name, `onDelete` → hapus post_tags), route `/api/admin/categories|tags` via loop CRUD generik, halaman `/admin/categories` & `/admin/tags` (CrudPage), sidebar + mobile more-sheet + label EN/ID.
+- ⚠️ **Belum ada**: visitor_logs: tanpa retention policy.
 - HEAD: commit sprint 3 (lihat git log).
 - Ponytail config FULL untuk review/audit
 - Admin CRUD: hanya whitelisted columns; login uniform error (anti user enumeration)
