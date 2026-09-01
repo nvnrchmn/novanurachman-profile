@@ -30,6 +30,7 @@ var specs = map[string]tableSpec{
 			"excerpt_en", "excerpt_id",
 			"content_en", "content_id",
 			"cover_image", "tags", "is_published", "published_at",
+			"category_id",
 		},
 		soft:        true,
 		nullIfEmpty: []string{"published_at"},

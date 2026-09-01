@@ -4,6 +4,13 @@ import { Plus, Pencil, Trash2, X, Eye, FileText, Wand2 } from 'lucide-react';
 import { api, apiData } from '@/lib/api';
 import { Spinner, EmptyState, ErrorState } from '@/components/ui';
 import { renderMarkdown } from '@/lib/markdown';
+import { useLang } from '@/lib/lang';
+
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+}
 
 interface PostRow {
   id: string;
@@ -18,6 +25,9 @@ interface PostRow {
   tags: string;
   is_published: number | boolean;
   published_at: string | null;
+  category_id: string | null;
+  category?: Category;
+  view_count: number;
 }
 
 type Tab = 'en' | 'id';
@@ -32,6 +42,7 @@ const BLANK: Record<string, any> = {
   content_id: '',
   cover_image: '',
   tags: '',
+  category_id: '',
   is_published: true,
   published_at: '',
 };
@@ -69,7 +80,9 @@ function fmtPub(iso: string | null): string {
 }
 
 export default function PostsPage() {
+  const { t } = useLang();
   const [rows, setRows] = useState<PostRow[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [open, setOpen] = useState(false);
@@ -80,6 +93,15 @@ export default function PostsPage() {
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState('');
 
+  const loadCategories = async () => {
+    try {
+      const data = await apiData<Category[]>('/categories');
+      if (data) setCategories(data);
+    } catch (e) {
+      // ignore
+    }
+  };
+
   const load = () => {
     setLoading(true);
     setError('');
@@ -89,7 +111,10 @@ export default function PostsPage() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(load, []);
+  useEffect(() => {
+    loadCategories();
+    load();
+  }, []);
 
   const openCreate = () => {
     setForm({ ...BLANK });
@@ -150,6 +175,7 @@ export default function PostsPage() {
       content_id: form.content_id,
       cover_image: form.cover_image,
       tags: form.tags,
+      category_id: form.category_id || null,
       is_published: form.is_published,
       published_at: pubAt ? pubAt.replace('T', ' ') + ':00' : '',
     };
@@ -403,6 +429,27 @@ export default function PostsPage() {
                   </div>
                 </div>
 
+                <div>
+                  <label htmlFor="f-category" className="mb-1.5 block font-mono text-xs text-mist-400">
+                    Kategori
+                  </label>
+                  <select
+                    id="f-category"
+                    className="input"
+                    value={form.category_id ?? ''}
+                    onChange={(e) => set('category_id', e.target.value)}
+                  >
+                    <option value="">{t('Pilih kategori', 'Pilih kategori')}</option>
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label htmlFor="f-tags" className="mb-1.5 block font-mono text-xs text-mist-400">
                     Tags

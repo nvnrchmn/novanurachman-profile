@@ -18,11 +18,15 @@
 - Visitor counter: middleware `handlers.VisitorCounter` + GET `/api/visitors`; PWA: `manifest.json` + `sw.js` di public/
 
 ## Status Terakhir (cek 2026-09-01)
-- ✅ Analytics dashboard live: `/api/admin/analytics?days=N` (summary, daily, top pages, referrer by host, devices, browsers) + halaman `/admin/analytics` (stat cards, SVG bar chart daily, toggle kunjungan/pengunjung, range 7/14/30).
-- ✅ **Visitor tracking fix**: `realIP()` baca X-Forwarded-For/X-Real-IP (sebelumnya semua = 127.0.0.1 → unique visitor rusak). Middleware + query analytics filter bot UA, aset (`.js/.css/...`), dan path serangan (wp-*, wordpress, xmlrpc, phpmyadmin, .env/.git, dsb). Pola filter ada di `cleanWhere` (analytics.go) & `attackPathRe` (visitor.go) — **jaga konsisten keduanya**.
-- ⚠️ Catatan: data historis (sebelum fix IP) punya unique-visitor=1; angka unik baru akurat untuk kunjungan baru.
-- ✅ Blog module live (lihat status sebelumnya). Admin layout: sidebar grouped + bottom nav mobile.
-- HEAD: commit sprint 2 (lihat git log). visitor_logs: tanpa retention policy.
+- ✅ **Sprint 3 — Blog categories/tags/related SELESAI**: migration `007_categories_tags.sql` (tabel categories, tags, post_tags; posts + category_id + view_count), endpoint `/api/categories`, `/api/tags`, `/api/posts/:slug/tags`, `/api/posts/:slug/related`, `ListPosts?category=` filter, scanPost → `tags_list` (JOIN post_tags).
+- ⚠️ **Fix penting**: route related/tags pakai `:slug` (bukan `:id` — posts.id format custom seperti `po-demo`, bukan slug). Jangan kembalikan ke `:id`.
+- ✅ BlogPage: filter kategori + chip tags. Admin PostsPage: dropdown kategori. BlogDetailPage: read time, related posts, social share (Web Share API + copy link).
+- ✅ **PWA install prompt**: `frontend/src/components/InstallPrompt.tsx` (beforeinstallprompt + hint iOS), mounted di App.tsx.
+- ✅ **sw.js v2**: CACHE_NAME v2, install hanya cache '/' + '/index.html' (asset Vite hashed → runtime cache; STATIC_ASSETS non-hashed dulu menyebabkan install SW gagal), API network-first + fallback cache, navigasi network-first → fallback '/', aset static cache-first.
+- ✅ Analytics dashboard + visitor tracking fix (lihat status sebelumnya).
+- ⚠️ Catatan: data historis (sebelum fix IP) punya unique-visitor=1.
+- ⚠️ **Belum ada**: admin CRUD untuk categories/tags (kelola via SQL dulu: `INSERT INTO categories/tags` + `post_tags`). visitor_logs: tanpa retention policy.
+- HEAD: commit sprint 3 (lihat git log).
 - Ponytail config FULL untuk review/audit
 - Admin CRUD: hanya whitelisted columns; login uniform error (anti user enumeration)
 - SEO meta di-inject per route dari tabel `seo_meta` oleh backend

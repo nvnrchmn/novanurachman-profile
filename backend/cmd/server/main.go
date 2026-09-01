@@ -52,6 +52,10 @@ func main() {
 	api.Get("/skills", handlers.ListSkills)
 	api.Get("/posts", handlers.ListPosts)
 	api.Get("/posts/:slug", handlers.GetPostBySlug)
+	api.Get("/categories", handlers.ListCategories)
+	api.Get("/tags", handlers.ListTags)
+	api.Get("/posts/:slug/tags", handlers.GetPostTags)
+	api.Get("/posts/:slug/related", handlers.GetRelatedPosts)
 	api.Get("/visitors", handlers.GetVisitorCount)
 
 	// ---- Contact form (CSRF protected) ----

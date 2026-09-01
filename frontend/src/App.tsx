@@ -6,6 +6,7 @@ import { AdminLayout } from '@/components/AdminLayout';
 import { AuthProvider, useAuth } from '@/lib/auth';
 import { Spinner } from '@/components/ui';
 import { CrudPage } from '@/pages/admin/CrudPage';
+import InstallPrompt from '@/components/InstallPrompt';
 
 // Public pages
 const HomePage = lazy(() => import('@/pages/public/HomePage'));
@@ -58,6 +59,7 @@ const YES_NO = (v: unknown) =>
 export default function App() {
   return (
     <AuthProvider>
+      <InstallPrompt />
       <Suspense fallback={<Fallback />}>
         <Routes>
           {/* Public */}

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, CalendarDays, Rss } from 'lucide-react';
+import { ArrowRight, CalendarDays, Rss, Filter, X } from 'lucide-react';
 
 import { apiData } from '@/lib/api';
-import type { Post } from '@/lib/types';
+import type { Post, Category, Tag } from '@/lib/types';
 import { Reveal, SectionHeading, Spinner, EmptyState, ErrorState } from '@/components/ui';
 import { useLang } from '@/lib/lang';
 import { formatDate } from '@/lib/markdown';
@@ -11,25 +11,47 @@ import { formatDate } from '@/lib/markdown';
 export default function BlogPage() {
   const { t, lang } = useLang();
   const [posts, setPosts] = useState<Post[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  const loadCategories = async () => {
+    try {
+      const data = await apiData<Category[]>('/categories');
+      if (data) setCategories(data);
+    } catch (e) {
+      // ignore
+    }
+  };
 
   const load = () => {
     setLoading(true);
     setError('');
-    apiData<Post[]>('/posts')
+    const url = selectedCategory ? `/posts?category=${selectedCategory}` : '/posts';
+    apiData<Post[]>(url)
       .then((d) => setPosts(d || []))
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   };
 
-  useEffect(load, [lang]);
+  useEffect(() => {
+    loadCategories();
+  }, [lang]);
 
-  const tagsOf = (p: Post) =>
-    p.tags
+  useEffect(() => {
+    load();
+  }, [lang, selectedCategory]);
+
+  const tagsOf = (p: Post): (string | Tag)[] => {
+    if (p.tags_list && p.tags_list.length) {
+      return p.tags_list;
+    }
+    return p.tags
       .split(',')
       .map((x) => x.trim())
       .filter(Boolean);
+  };
 
   return (
     <section className="container-content py-16">
@@ -61,6 +83,48 @@ export default function BlogPage() {
         <EmptyState message={t('No posts yet.', 'Belum ada tulisan.')} />
       )}
 
+      {/* Category Filter */}
+      {(categories.length > 0 || selectedCategory) && (
+        <div className="mb-6 flex flex-wrap items-center gap-2">
+          <Filter className="text-mist-500" size={16} aria-hidden="true" />
+          <span className="text-sm font-medium text-mist-400">
+            {t('Category:', 'Kategori:')}
+          </span>
+          <button
+            className={`px-3 py-1.5 rounded-full text-sm font-mono transition-colors ${
+              !selectedCategory
+                ? 'bg-accent/15 text-accent'
+                : 'bg-slate-800 text-mist-400 hover:bg-slate-700'
+            }`}
+            onClick={() => setSelectedCategory('')}
+          >
+            {t('All', 'Semua')}
+          </button>
+          {categories.map((cat) => (
+            <button
+              key={cat.id}
+              className={`px-3 py-1.5 rounded-full text-sm font-mono transition-colors ${
+                selectedCategory === cat.id
+                  ? 'bg-accent/15 text-accent'
+                  : 'bg-slate-800 text-mist-400 hover:bg-slate-700'
+              }`}
+              onClick={() => setSelectedCategory(cat.id)}
+            >
+              {cat.name}
+            </button>
+          ))}
+          {selectedCategory && (
+            <button
+              className="p-1.5 rounded-full hover:bg-slate-700 text-mist-500"
+              onClick={() => setSelectedCategory('')}
+              aria-label={t('Clear filter', 'Hapus filter')}
+            >
+              <X size={12} aria-hidden="true" />
+            </button>
+          )}
+        </div>
+      )}
+
       <div className="space-y-4">
         {posts.map((p, i) => (
           <Reveal key={p.id} delay={i * 60}>
@@ -83,11 +147,29 @@ export default function BlogPage() {
                       {formatDate(p.published_at, lang)}
                     </span>
                   )}
-                  {tagsOf(p).map((tag) => (
-                    <span key={tag} className="tag">
-                      {tag}
+                  {p.category && (
+                    <span className="px-2 py-0.5 text-xs font-mono bg-accent/10 text-accent rounded">
+                      {p.category.name}
                     </span>
-                  ))}
+                  )}
+                  {tagsOf(p).map((tag, idx) => {
+                    const isTag = typeof tag === 'object' && tag !== null && 'name' in tag;
+                    const name = isTag ? (tag as Tag).name : (tag as string);
+                    const color = isTag ? (tag as Tag).color : undefined;
+                    return (
+                      <span
+                        key={`${idx}-${name}`}
+                        className="tag"
+                        style={
+                          color
+                            ? { backgroundColor: `${color}15`, color }
+                            : undefined
+                        }
+                      >
+                        {name}
+                      </span>
+                    );
+                  })}
                 </div>
 
                 <h3 className="mt-3 text-lg font-medium text-mist-50">

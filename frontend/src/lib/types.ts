@@ -51,6 +51,21 @@ export interface Skill {
   icon: string;
 }
 
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  sort_order: number;
+}
+
+export interface Tag {
+  id: string;
+  name: string;
+  slug: string;
+  color: string;
+}
+
 export interface Post {
   id: string;
   slug: string;
@@ -59,6 +74,9 @@ export interface Post {
   content: string;
   cover_image: string;
   tags: string;
+  tags_list?: Tag[];
+  category?: Category;
+  view_count: number;
   published_at: string;
 }
 
