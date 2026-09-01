@@ -100,6 +100,59 @@ export default function App() {
             <Route path="analytics" element={<AnalyticsPage />} />
 
             <Route
+              path="categories"
+              element={
+                <CrudPage
+                  title="Categories"
+                  endpoint="admin/categories"
+                  columns={[
+                    { key: 'name_en', label: 'nama (EN)' },
+                    { key: 'name_id', label: 'nama (ID)' },
+                    { key: 'slug', label: 'slug' },
+                    { key: 'sort_order', label: 'urutan' },
+                  ]}
+                  fields={[
+                    { key: 'name_en', label: 'Nama (EN)', required: true },
+                    { key: 'name_id', label: 'Nama (ID)', required: true },
+                    { key: 'slug', label: 'Slug', required: true, help: 'huruf kecil, pakai tanda hubung' },
+                    { key: 'description_en', label: 'Deskripsi (EN)', type: 'textarea' },
+                    { key: 'description_id', label: 'Deskripsi (ID)', type: 'textarea' },
+                    { key: 'sort_order', label: 'Urutan', type: 'number' },
+                  ]}
+                />
+              }
+            />
+
+            <Route
+              path="tags"
+              element={
+                <CrudPage
+                  title="Tags"
+                  endpoint="admin/tags"
+                  columns={[
+                    { key: 'name', label: 'nama' },
+                    { key: 'slug', label: 'slug' },
+                    {
+                      key: 'color',
+                      label: 'warna',
+                      render: (r) => (
+                        <span className="inline-flex items-center gap-1.5 font-mono text-xs">
+                          <span className="inline-block h-3 w-3 rounded-full border border-ink-700" style={{ background: r.color }} />
+                          {r.color}
+                        </span>
+                      ),
+                    },
+                  ]}
+                  fields={[
+                    { key: 'name', label: 'Nama', required: true },
+                    { key: 'slug', label: 'Slug', required: true, help: 'huruf kecil, pakai tanda hubung' },
+                    { key: 'color', label: 'Warna (hex)', placeholder: '#4ADE80' },
+                  ]}
+                />
+              }
+            />
+
+            <Route
               path="projects"
               element={
                 <CrudPage

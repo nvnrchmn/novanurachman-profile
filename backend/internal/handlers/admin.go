@@ -19,6 +19,7 @@ type tableSpec struct {
 	soft        bool   // has deleted_at
 	nullIfEmpty []string // empty-string values are stored as NULL
 	orderBy     string // default: order_no ASC, id DESC
+	onDelete    string // SQL (1 arg: id) dijalankan setelah soft-delete untuk bersihkan relasi
 }
 
 var specs = map[string]tableSpec{
@@ -63,6 +64,27 @@ var specs = map[string]tableSpec{
 			"name", "category", "level", "icon", "order_no", "is_published",
 		},
 		soft: true,
+	},
+	"categories": {
+		table:  "categories",
+		prefix: "cat",
+		columns: []string{
+			"name_en", "name_id", "slug",
+			"description_en", "description_id", "sort_order",
+		},
+		soft:    true,
+		orderBy: "sort_order ASC, id DESC",
+		// Lepas relasi posts agar post tetap tampil (LEFT JOIN) tanpa kategori.
+		onDelete: "UPDATE posts SET category_id = NULL WHERE category_id = ?",
+	},
+	"tags": {
+		table:   "tags",
+		prefix:  "tag",
+		columns: []string{"name", "slug", "color"},
+		soft:    true,
+		orderBy: "name ASC",
+		// Hapus relasi post_tags agar tidak ada baris yatim.
+		onDelete: "DELETE FROM post_tags WHERE tag_id = ?",
 	},
 }
 
@@ -255,6 +277,10 @@ func AdminDelete(resource string) fiber.Handler {
 
 		if _, err := database.DB.Exec(q, c.Params("id")); err != nil {
 			return c.Status(500).JSON(fiber.Map{"success": false, "message": err.Error()})
+		}
+		// Bersihkan relasi (post_tags / posts.category_id) setelah soft-delete.
+		if spec.onDelete != "" {
+			database.DB.Exec(spec.onDelete, c.Params("id"))
 		}
 		return c.JSON(fiber.Map{"success": true})
 	}

@@ -72,7 +72,7 @@ func main() {
 
 	admin.Put("/profile", handlers.UpsertProfile)
 
-	for _, res := range []string{"posts", "projects", "experiences", "skills"} {
+	for _, res := range []string{"posts", "projects", "experiences", "skills", "categories", "tags"} {
 		admin.Get("/"+res, handlers.AdminList(res))
 		admin.Post("/"+res, handlers.AdminCreate(res))
 		admin.Put("/"+res+"/:id", handlers.AdminUpdate(res))

@@ -14,6 +14,8 @@ import {
   MoreHorizontal,
   Terminal,
   X,
+  Tags,
+  FolderTree,
 } from 'lucide-react';
 
 import { useAuth } from '@/lib/auth';
@@ -43,6 +45,8 @@ const GROUPS: NavGroup[] = [
     titleKey: 'content',
     items: [
       { to: '/admin/posts', labelKey: 'blog', Icon: FileText },
+      { to: '/admin/categories', labelKey: 'categories', Icon: FolderTree },
+      { to: '/admin/tags', labelKey: 'tags', Icon: Tags },
       { to: '/admin/projects', labelKey: 'projects', Icon: FolderKanban },
       { to: '/admin/experiences', labelKey: 'experience', Icon: Briefcase },
       { to: '/admin/skills', labelKey: 'skills', Icon: Wrench },
@@ -65,6 +69,8 @@ const LABELS: Record<string, Record<string, string>> = {
     dashboard: 'Dashboard',
     analytics: 'Analytics',
     blog: 'Blog',
+    categories: 'Categories',
+    tags: 'Tags',
     projects: 'Projects',
     experience: 'Experience',
     skills: 'Skills',
@@ -81,6 +87,8 @@ const LABELS: Record<string, Record<string, string>> = {
     dashboard: 'Dasbor',
     analytics: 'Analytics',
     blog: 'Blog',
+    categories: 'Kategori',
+    tags: 'Tag',
     projects: 'Proyek',
     experience: 'Pengalaman',
     skills: 'Keahlian',
@@ -103,6 +111,8 @@ const BOTTOM_NAV: NavItem[] = [
 
 const MORE_ITEMS: NavItem[] = [
   { to: '/admin/analytics', labelKey: 'analytics', Icon: BarChart3 },
+  { to: '/admin/categories', labelKey: 'categories', Icon: FolderTree },
+  { to: '/admin/tags', labelKey: 'tags', Icon: Tags },
   { to: '/admin/experiences', labelKey: 'experience', Icon: Briefcase },
   { to: '/admin/skills', labelKey: 'skills', Icon: Wrench },
   { to: '/admin/profile', labelKey: 'profile', Icon: User },
